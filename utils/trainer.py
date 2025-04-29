@@ -21,6 +21,16 @@ from torch.cuda.amp import GradScaler
 from torch.utils.tensorboard import SummaryWriter
 from utils.metrics import overall_accuracy, fast_hist, per_class_iu, per_class_accuracy
 
+from collections import OrderedDict
+
+def remove_module_prefix(state_dict):
+    new_state_dict = OrderedDict()
+    for k, v in state_dict.items():
+        name = k
+        if k.startswith("module."):
+            name = k[7:]  # remove `module.`
+        new_state_dict[name] = v
+    return new_state_dict
 
 class TrainingManager:
     def __init__(
@@ -245,7 +255,8 @@ class TrainingManager:
             filename,
             map_location=f"cuda:{rank}",
         )
-        self.net.load_state_dict(ckpt["net"])
+        cleaned_state_dict = remove_module_prefix(ckpt["net"])
+        self.net.load_state_dict(cleaned_state_dict)
         if ckpt.get("optim") is None:
             warnings.warn("Optimizer state not available")
         else:

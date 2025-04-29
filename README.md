@@ -196,11 +196,14 @@ To retrain the WaffleIron-48-256 backbone, type
 ```
 python launch_train.py \
 --dataset semantic_kitti \
---path_dataset /path/to/kitti/ \
---log_path ./logs/WaffleIron-48-256__kitti \
+--path_dataset /mnt/data/semantickitti/ \
+--log_path ./pretrained_models/WaffleIron-48-256__kitti/ \
 --config ./configs/WaffleIron-48-256__kitti.yaml \
---multiprocessing-distributed \
---fp16
+--fp16 \
+--gpu 0 \
+--restart \
+--compress \
+--eval
 ```
 
 At the beginning of the training, the instances for cutmix augmentation are saved in `/tmp/semantic_kitti_instances/`. If this process is interrupted before completion, please delete `/tmp/semantic_kitti_instances/` and relaunch training. You can disable the instance cutmix augmentations by editing the `yaml` config file to set `instance_cutmix` to `False`.
